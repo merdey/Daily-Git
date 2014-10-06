@@ -1,6 +1,5 @@
 import pygame, sys
 from pygame.locals import *
-from button import Button
 
 pygame.init()
 

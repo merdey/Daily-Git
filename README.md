@@ -16,3 +16,7 @@ inspired by my experiences with the now dead sc2manager.com
 
 ###Pygame
 Collection of 'games' (some programs stretch that definition a little) that make use of the pygame library
+
+* Conway's Game of Life, my personal favorite
+* Snake
+* Galaga (although it's much closer to space invaders)
