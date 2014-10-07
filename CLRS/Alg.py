@@ -1,3 +1,32 @@
+##########
+#DATA STRUCTURES
+##########
+
+class Stack:
+    def __init__(self):
+        self.last = None
+
+    def push(self, value):
+        newNode = Node(value)
+        newNode.prev = self.last
+        self.last = newNode
+
+    def pop(self):
+        value = self.last.value
+        self.last = self.last.prev
+
+        return value
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.prev = None
+
+
+##########
+#SORTING
+##########
+
 #http://stackoverflow.com/questions/18761766/mergesort-python
 def mergeSort(x):
     #base case
@@ -20,8 +49,8 @@ def mergeSort(x):
             i += 1
     #add whichever side is left over and return
     #careful += != append()
-    result += (left[i:])
-    result += (right[j:])
+    result += left[i:]
+    result += right[j:]
 
     return result
 
@@ -34,6 +63,11 @@ def insertionSort(x):
             i -= 1
         #x[i + 1] = key #not sure what this does but it was in the book
 
+
+##########
+#SEARCHING
+##########
+            
 def linearSearch(x, val):
     #invariant: val is not in A[:i - 1] (to the left of i)
     for i in range(len(x)):
@@ -55,9 +89,8 @@ def binarySearch(x, val):
         else: #val < x[mid]
             high = mid - 1
     return False
-        
+
 x = [1, -2, 5, 4, 2, 3, 8, 9, 20, 11, 15, 14, 16, 12, 0, -1]
-print(x)
-y = mergeSort(x)
-z = mergeSortTest(x)
-print(y == z)
+x = mergeSort(x)
+y = binarySearch(x, 5)
+
