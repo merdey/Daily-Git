@@ -17,11 +17,33 @@ class Stack:
 
         return value
 
+class Queue:
+    def __init__(self):
+        self.first = None
+        self.last = None
+
+    def enqueue(self, value):
+        newNode = Node(value)
+        if not self.first:
+            self.first = newNode
+            self.last = newNode
+        else:
+            oldLast = self.last
+            self.last = newNode
+            oldLast.prev = self.last
+    
+    def dequeue(self):
+        firstValue = self.first.value
+        if self.first:
+            self.first = self.first.prev
+        else:
+            self.first = None
+        return firstValue
+
 class Node:
     def __init__(self, value):
         self.value = value
         self.prev = None
-
 
 ##########
 #SORTING
