@@ -97,16 +97,47 @@ class ApplicationList:
         return s
 
 #playing with kivy
+from kivy.app import App
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
 from kivy.uix.listview import ListView
+from kivy.uix.textinput import TextInput
 from kivy.base import runTouchApp
 
 appList = ApplicationList('apps.txt')
-appList.sort(DEFAULT_SORT, True) #defaults to listing companies by interest from highest to lowest
+appList.sort('company_name')
 
-class MainView(ListView):
+class MainScreen(GridLayout):
+
     def __init__(self, **kwargs):
-        super(MainView, self).__init__(
-            item_strings=[app.summary() for app in appList.apps])
+        super(MainScreen, self).__init__(**kwargs)
+        self.cols = 2
+        self.rows = 2
+        self.add_widget(
+            Label(
+                text="Company",
+                size_hint=(.5, .2)))
+        self.add_widget(
+            Label(
+                text="Interest",
+                size_hint=(.5, .2)))
+        self.add_widget(ListSummaryNames())
+        self.add_widget(ListSummaryInterest())
+
+class MyApp(App):
+    def build(self):
+        return MainScreen()
+
+class ListSummaryNames(ListView):
+    def __init__(self, **kwargs):
+        super(ListSummaryNames, self).__init__(
+            item_strings=[app.company_name for app in appList.apps])
+
+class ListSummaryInterest(ListView):
+    def __init__(self, **kwargs):
+        super(ListSummaryInterest, self).__init__(
+            item_strings=[str(app.interest) for app in appList.apps])
 
 if __name__ == '__main__':
-    runTouchApp(MainView())
+    MyApp().run()
+    #runTouchApp(MainView())
