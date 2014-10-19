@@ -106,13 +106,35 @@ def binarySearch(x, val):
             return mid
         elif val > x[mid]:
             low = mid + 1
-            if low == len(x):
-                return False
         else: #val < x[mid]
             high = mid - 1
     return False
 
-x = [1, -2, 5, 4, 2, 3, 8, 9, 20, 11, 15, 14, 16, 12, 0, -1]
-x = mergeSort(x)
-y = binarySearch(x, 5)
+#########
+#CTCI
+#########
+def allUnique(string):
+    for i in range(len(string) - 1):
+        if string[i] in string[i + 1:]:
+            return False
+    return True
 
+def reverseCString(string):
+    reversedString = ''
+    for i in range(len(string) - 2, -1, -1):
+        reversedString += string[i]
+    return reversedString + string[-1]
+
+def anagram(string1, string2):
+    count1 = countLetters(string1)
+    count2 = countLetters(string2)
+    return count1 == count2
+
+def countLetters(string):
+    count = {}
+    for letter in string:
+        if letter in count:
+            count[letter] += 1
+        else:
+            count[letter] = 1
+    return count
