@@ -91,8 +91,35 @@ def menuScreen():
     buttons.append(creative_button)
     competitive_button = Button(300, GRID_HEIGHT - 225, 100, 100, "Competitive", newCompetitiveGame)
     buttons.append(competitive_button)
-    options_button = Button(300, GRID_HEIGHT - 125, 100, 100, "Options", optionsMenu)
+    options_button = Button(300, GRID_HEIGHT - 125, 100, 100, "Options", options)
     buttons.append(options_button)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                for button in buttons:
+                    if button.hitbox().collidepoint(pos):
+                        button.clicked()
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        DISPLAY_SURFACE.fill(WHITE)
+
+        for button in buttons:
+            button.draw()
+
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+    
+def optionsScreen():
+    buttons = []
+    menu_button = Button(300, GRID_HEIGHT - 125, 100, 100, "Back to main menu", menuScreen)
+    buttons.append(menu_button)
+
+    options = []
 
     while True:
         for event in pygame.event.get():
@@ -212,6 +239,28 @@ def spawnRPentomino(x, y):
     grid[y + 1][x] = 1
     grid[y - 1][x + 1] = 1
 
+class Option:
+    def __init(self, x, y, width, height, text, value, max_value):
+        self.rect = (x, y, width, height)
+        self.text = text
+        self.value = value
+
+    def hitbox(self):
+        return self.textRectObj
+
+    def clicked(self):
+        self.value += 1
+        if self.value > max_value:
+            self.value = 1
+
+    def draw(self):
+        self.fontObj = pygame.font.Font('freesansbold.ttf', 24)
+        self.textSurfaceObj = self.fontObj.render(self.text + ': ' + self.value, True, TEXT_COLOR)
+        self.textRectObj = self.textSurfaceObj.get_rect()
+        self.textRectObj.center = (x, y)
+        
+        DISPLAY_SURFACE.blit(self.textSurfaceObj, self.textRectObj)
+
 class Button:
     def __init__(self, x, y, width, height, text, action):
         self.rect = (x, y, width, height)
@@ -259,8 +308,8 @@ def newCompetitiveGame():
     mode = 'competitive'
     gameLoop()
 
-def optionsMenu():
-    print('not implemented')
+def options():
+    optionsScreen()
 
 if __name__ == '__main__':
     menuScreen()
