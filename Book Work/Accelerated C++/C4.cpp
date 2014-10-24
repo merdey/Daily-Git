@@ -8,6 +8,16 @@
 
 using namespace std;
 
+struct Student_info {
+  string name;
+  double midterm, final;
+  vector<double> homework;
+};
+
+bool compare(const Student_info& x, const Student_info& y) {
+  return x.name < y.name;
+}
+
 double median(vector<double> vec) {
   typedef vector<double>::size_type vec_sz;
   
@@ -32,6 +42,10 @@ double grade(double midterm, double final, const vector<double>& hw) {
   return grade(midterm, final, median(hw));
 }
 
+double grade(const Student_info& s) {
+  return grade(s.midterm, s.final, s.homework);
+}
+
 istream& read_hw(istream& in, vector<double>& hw) {
   if (in) {
     //get rid of previous contents
@@ -47,31 +61,39 @@ istream& read_hw(istream& in, vector<double>& hw) {
   }
   return in;
 }
+
+istream& read(istream& is, Student_info& s) {
+  is >> s.name >> s.midterm >> s.final;
+
+  read_hw(is, s.homework);
+  return is;
+}
     
 
 int main() {
-  cout << "Enter your first name: ";
-  string name;
-  cin >> name;
-  cout << "Hello, " << name << "!" << endl;
+  vector<Student_info> students;
+  Student_info record;
+  string::size_type maxlen = 0;
 
-  cout << "Enter your midterm and final exam grades: ";
-  double midterm, final;
-  cin >> midterm >> final;
-  
-  cout << "Enter all your homework grades, followed by end-of-file: ";
-  vector<double> homework;
-  read_hw(cin, homework);
-
-  try {
-    double final_grade = grade(midterm, final, homework);
-    streamsize prec = cout.precision();
-    cout << "Your final grade is " << setprecision(3) << final_grade << setprecision(prec) << endl;
-  } 
-  catch (domain_error) {
-    cout << endl << "You must enter you grades. Please try again." << endl;
-    return 1;
+  while(read(cin,record)) {
+    maxlen = max(maxlen, record.name.size());
+    students.push_back(record);
   }
 
+  sort(students.begin(), students.end(), compare);
+
+  for (vector<Student_info>::size_type i = 0; i != students.size(); ++i) {
+    cout << students[i].name << string(maxlen + 1 - students[i].name.size(), ' ');
+    
+    try {
+      double final_grade = grade(students[i]);
+      streamsize prec = cout.precision();
+      cout << setprecision(3) << final_grade << setprecision(prec);
+    } catch (domain_error e) {
+      cout << e.what();
+    }
+
+    cout << endl;
+  }
   return 0;
 }
