@@ -20,8 +20,7 @@ valid_categories = ['Varied', #alias for "I'm not quite sure"
                     'Business',
                     ]
 
-app_attributes = ['Company Name',
-                  'Status',
+app_attributes = ['Status',
                   'Interest',
                   'URL',
                   'Category',
@@ -55,7 +54,7 @@ class JobApplication:
 
     def toDictionary(self):
         d = {'Company Name': self.company_name,
-             'Status': self.status,
+			 'Status': self.status,
              'Interest': self.interest,
              'URL': self.url,
              'Category': self.category,
@@ -158,7 +157,7 @@ class MasterDetailView(GridLayout):
             app_name=dict_adapter.selection[0].text,
             size_hint=(.7, 1.0))
         
-        dict_adapter.bind(on_selection_changed=detail_view.app_changed)
+        dict_adapter.bind(on_selection_change=detail_view.app_changed)
         self.add_widget(detail_view)
 
 
@@ -183,6 +182,7 @@ class AppDetailView(GridLayout):
                 self.add_widget(Label(text=str(app_data[self.app_name][attribute])))
 
     def app_changed(self, list_adapter, *args):
+        print('change')
         if len(list_adapter.selection) == 0:
             self.app_name = None
         else:
