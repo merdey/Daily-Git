@@ -1,97 +1,12 @@
 import pickle, math, sys, random
+from player import *
+from team import *
 
 LEAGUE_SIZE = 4
 TEAM_SIZE = 6
 GAME_DAY_ACTIONS = ['rest', 'play', 'train']
 OFF_DAY_ACTIONS = ['rest', 'train', 'stream']
-MIN_SALARY = 5
 NORMAL_GAME_WINNINGS = 100
-
-class Player:
-    def __init__(self, name, skill, potential, weekly_salary):
-        self.name = name
-        self.skill = skill
-        self.potential = potential
-        self.stamina = 100
-        self.action = 'rest'
-        self.weekly_salary = weekly_salary
-        self.money = 0
-
-    def takeAction(self):
-        if self.action == 'rest':
-            self.stamina = min(self.stamina + 25, 100)
-            self.detrain(2)
-        elif self.action == 'train':
-            self.stamina -= 10
-            self.train()
-        elif self.action == 'stream':
-            self.stamina -= 5
-            self.money = 50
-            self.detrain(1)
-        elif self.action == 'play':
-            self.stamina -= 20
-
-    def train(self):
-        training_effect = self.potential * .03
-        self.skill = min(self.skill + training_effect, 100)
-
-    def detrain(self, severity):
-        regression_effect = ((100 - self.potential) * .01) * severity
-        self.skill = max(self.skill - regression_effect, 1)
-
-    def __str__(self):
-        return self.name + ' skill:' + str(self.skill) + ' stamina:' + str(self.stamina) + ' weekly salary:' + str(self.weekly_salary) + ' last action:' + self.action
-
-class Team:
-    def __init__(self, name, players):
-        self.name = name
-        self.players = players
-        self.record = [0, 0, 0]
-        self.money = 500
-
-    def collectStreamIncome(self):
-        for player in self.players:
-            self.money += player.money
-            player.money = 0
-
-    def paySalaries(self):
-        for player in self.players:
-            self.money -= player.weekly_salary
-
-    def setPlayerActions(self, type_of_player, actions_list):
-        if type_of_player == 'human':
-            print(self)
-            for player in self.players:
-                print('what would you like ' + player.name + ' to do today?')
-                action = input()
-                while action not in actions_list:
-                    print('invalid action')
-                    action = input()
-                player.action = action
-        else:
-            for player in self.players:
-                action = random.choice(actions_list)
-                player.action = action
-
-    def takePlayerActions(self):
-        for player in self.players:
-            player.takeAction()
-
-    def isGameReady(self):
-        playersReady = 0
-        for player in self.players:
-            if player.action == 'play':
-                playersReady += 1
-
-        return (playersReady == 5)
-
-    def __str__(self):
-        s = self.name + '\n'
-        for player in self.players:
-            s += str(player) + '\n'
-        s += 'Record ' + str(self.record) + '\n'
-        s += 'Money ' + str(self.money) + '\n'
-        return s
 
 class League:
     def __init__(self, teams):
@@ -213,32 +128,13 @@ class Game:
             purple_team.money += NORMAL_GAME_WINNINGS
             blue_team.record[2] += 1
             return purple_team.name
-        
-def generateRandomPlayer():
-    names = ['x', 'hotshot', 'GG', 'bigfat', 'Dinh', 'stomp', 'aphro', 'qt', 'pie', 'jiji', 'ima', 'dyrus', 'noscopez', '420']
-    name = random.choice(names) + random.choice(names)
 
-    skill = random.randrange(1, 80)
-    potential = random.randrange(1, 100)
-    weekly_salary = max(int(random.randrange(15, 30) * (skill / 100)), MIN_SALARY) #weekly salary starts at 15-30% of skill, must be at least MIN_SALARY
-    
-    return Player(name, skill, potential, weekly_salary)
-
-def generateRandomTeam():
-    names = ['TSM', 'CLG', 'C9', 'M5', 'CRS', 'Fnatic', 'Dignitas']
-    name = random.choice(names)
-    
-    players = []
-    for i in range(TEAM_SIZE):
-        players.append(generateRandomPlayer())
-    
-    return Team(name, players)
-
+STARTING_TEAM_SIZE = 6
 def newLeague():
-    player_team = generateRandomTeam()
+    player_team = generateRandomTeam(STARTING_TEAM_SIZE)
     league_teams = [player_team]
     for i in range(LEAGUE_SIZE - 1):
-        league_teams.append(generateRandomTeam())
+        league_teams.append(generateRandomTeam(STARTING_TEAM_SIZE))
 
     league = League(league_teams)
     return league
@@ -252,7 +148,6 @@ def saveGame(game, filename):
 
 def loadGame(file):
     pass
-
 
 game = Game()
 while True:
