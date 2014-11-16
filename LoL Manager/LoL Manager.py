@@ -1,35 +1,11 @@
 import pickle, math, sys, random
 from player import *
 from team import *
+from league import *
 
-LEAGUE_SIZE = 4
-TEAM_SIZE = 6
 GAME_DAY_ACTIONS = ['rest', 'play', 'train']
 OFF_DAY_ACTIONS = ['rest', 'train', 'stream']
 NORMAL_GAME_WINNINGS = 100
-
-class League:
-    def __init__(self, teams):
-        self.teams = teams
-
-    def generateWeeklyMatchups(self):
-        matchups = []
-        random.shuffle(self.teams)
-        for i in range(0, LEAGUE_SIZE, 2):
-            matchups.append( [self.teams[i], self.teams[i + 1]] )
-        return matchups
-
-    def generatePlayoffBracket(self):
-        seeds = []
-        for team in self.teams:
-            seeds.append(team)
-        return seeds
-
-    def __str__(self):
-        s = ''
-        for team in self.teams:
-            s += str(team) + '\n\n'
-        return s
 
 class Game:  
     def __init__(self):
@@ -128,16 +104,6 @@ class Game:
             purple_team.money += NORMAL_GAME_WINNINGS
             blue_team.record[2] += 1
             return purple_team.name
-
-STARTING_TEAM_SIZE = 6
-def newLeague():
-    player_team = generateRandomTeam(STARTING_TEAM_SIZE)
-    league_teams = [player_team]
-    for i in range(LEAGUE_SIZE - 1):
-        league_teams.append(generateRandomTeam(STARTING_TEAM_SIZE))
-
-    league = League(league_teams)
-    return league
 
 def newGame():
     pass
