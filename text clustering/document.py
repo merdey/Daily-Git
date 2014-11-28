@@ -25,14 +25,18 @@ class Document:
                 self.words.add(word)
         self.length += len(new_word_counts)
 
-def distance(doc_a, doc_b):
+def distance(doc_a, doc_b, corpus): #adjust 
     distance = 0
     all_words = doc_a.words | doc_b.words
     for word in all_words:
-        distance += abs(doc_a.frequency(word) - doc_b.frequency(word))
+        idf = corpus.idf(word)
+        adjusted_a = doc_a.frequency(word) * idf
+        adjusted_b = doc_b.frequency(word) * idf
+        distance += abs(adjusted_a - adjusted_b)
     return distance
 
-def documentFromUrl(url):
+def documentFromUrl(url, corpus):
+    #reads text from url and creates document while keeping corpus counts updated
     r = requests.get(url)
     source = r.text
     soup = BeautifulSoup(source)
@@ -48,4 +52,6 @@ def documentFromUrl(url):
             word_counts[word] += 1
         else:
             word_counts[word] = 1
-    return Document(url, word_counts)
+    doc = Document(url, word_counts)
+    corpus.addDocument(doc)
+    return doc

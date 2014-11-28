@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from corpus import *
 from cluster import *
 from document import *
 import nltk, requests, operator
@@ -12,23 +13,26 @@ cluster_definitions = {'Python': ['https://www.python.org/',
                                   'http://www.gamespot.com/',
                                   'http://www.ign.com/'
                                   ]
-                         }
+                      }
+corpus = Corpus()
 clusters = []
 for cluster_name, urls in cluster_definitions.items():
     cluster_docs = []
     for url in urls:
-        print(url + ' successfully read')
-        cluster_docs.append(documentFromUrl(url))
+        print('reading ' + url)
+        cluster_docs.append(documentFromUrl(url, corpus))
     clusters.append(Cluster(cluster_name, cluster_docs))
 
 while(True):
     response = input('Enter a url or -1 to quit: ')
-    if response == -1:
+    if response == '-1':
         break
     else:
-        doc = documentFromUrl(response)
+        doc = documentFromUrl(response, corpus)
         distances = {}
         for cluster in clusters:
-            distances[cluster.name] = distance(doc, cluster.corpus)
+            distances[cluster] = distance(doc, cluster.corpus, corpus)
 
-        print(min(distances.items(), key=operator.itemgetter(1))[0])
+        matched_cluster = min(distances.items(), key=operator.itemgetter(1))[0]
+        print('Belongs to: ' + matched_cluster.name)
+        matched_cluster.update(doc)
