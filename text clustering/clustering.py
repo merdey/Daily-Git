@@ -1,30 +1,34 @@
 from bs4 import BeautifulSoup
-from document import Document, distance
-import nltk, requests
+from cluster import *
+from document import *
+import nltk, requests, operator
 
-urls = ['http://www.crummy.com/software/BeautifulSoup/bs4/doc/',
-        'http://en.wikipedia.org/wiki/Cluster_analysis',
-        'http://www.nltk.org/book/'
-        ]
-
+#creates clusters with predefined documents
+cluster_definitions = {'Python': ['https://www.python.org/',
+                                  'http://en.wikipedia.org/wiki/Python_(programming_language)',
+                                  'http://learnpythonthehardway.org/book/'
+                                  ],
+                       'Gaming': ['http://kotaku.com/',
+                                  'http://www.gamespot.com/',
+                                  'http://www.ign.com/'
+                                  ]
+                         }
 clusters = []
-documents = []
-for url in urls:
-    r = requests.get(url)
-    source = r.text
-    soup = BeautifulSoup(source)
-    raw = soup.get_text()
-    
-    #create a somewhat sanitized list of words
-    words = [token.lower() for token in nltk.word_tokenize(raw) if token.isalpha() and len(token) > 3]
+for cluster_name, urls in cluster_definitions.items():
+    cluster_docs = []
+    for url in urls:
+        print(url + ' successfully read')
+        cluster_docs.append(documentFromUrl(url))
+    clusters.append(Cluster(cluster_name, cluster_docs))
 
-    #count words and create new document
-    word_counts = {}
-    for word in words:
-        if word in word_counts:
-            word_counts[word] += 1
-        else:
-            word_counts[word] = 1
-    d = Document(url, word_counts)
-    documents.append(d)
+while(True):
+    response = input('Enter a url or -1 to quit: ')
+    if response == -1:
+        break
+    else:
+        doc = documentFromUrl(response)
+        distances = {}
+        for cluster in clusters:
+            distances[cluster.name] = distance(doc, cluster.corpus)
 
+        print(min(distances.items(), key=operator.itemgetter(1))[0])
