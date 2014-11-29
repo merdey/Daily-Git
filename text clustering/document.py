@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 import nltk, requests
 
 class Document:
-    def __init__(self, title, word_counts={}):
-        self.title = title
+    def __init__(self, name, word_counts={}):
+        self.name = name
         self.word_counts = word_counts
         self.length = len(word_counts)
         
@@ -25,7 +25,12 @@ class Document:
                 self.words.add(word)
         self.length += len(new_word_counts)
 
-def distance(doc_a, doc_b, corpus): #adjust 
+    def remove(self, word_counts):
+        for word in word_counts:
+            self.word_counts[word] -= word_counts[word]
+        self.length -= len(word_counts)
+
+def distance(doc_a, doc_b, corpus):
     distance = 0
     all_words = doc_a.words | doc_b.words
     for word in all_words:
@@ -37,21 +42,24 @@ def distance(doc_a, doc_b, corpus): #adjust
 
 def documentFromUrl(url, corpus):
     #reads text from url and creates document while keeping corpus counts updated
-    r = requests.get(url)
-    source = r.text
-    soup = BeautifulSoup(source)
-    raw = soup.get_text()
-    
-    #create a somewhat sanitized list of words
-    words = [token.lower() for token in nltk.word_tokenize(raw) if token.isalpha() and len(token) > 3]
+    try:
+        r = requests.get(url)
+        source = r.text
+        soup = BeautifulSoup(source)
+        raw = soup.get_text()
+        
+        #create a somewhat sanitized list of words
+        words = [token.lower() for token in nltk.word_tokenize(raw) if token.isalpha()]
 
-    #count words and create new document
-    word_counts = {}
-    for word in words:
-        if word in word_counts:
-            word_counts[word] += 1
-        else:
-            word_counts[word] = 1
-    doc = Document(url, word_counts)
-    corpus.addDocument(doc)
-    return doc
+        #count words and create new document
+        word_counts = {}
+        for word in words:
+            if word in word_counts:
+                word_counts[word] += 1
+            else:
+                word_counts[word] = 1
+        doc = Document(url, word_counts)
+        corpus.addDocument(doc)
+        return doc
+    except:
+        print('Could not create document from url')
