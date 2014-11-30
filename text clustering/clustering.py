@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from corpus import *
 from category import *
 from document import *
+from bookmark_conversion import *
 import nltk, pickle, requests, operator
 
 
@@ -13,15 +14,17 @@ def printOptions(options):
         print('[{0}] {1}'.format(i, option[0]))
         i += 1
 
-def categorize():
+def categorizeInput():
     url = input('Enter url: ')
 
-    doc = documentFromUrl(url, corpus)
-    distances = {}
-    for category in categories:
-        distances[category] = distance(doc, category.corpus, corpus)
+    categorizeSupervised(url)
 
-    matched_category = min(distances.items(), key=operator.itemgetter(1))[0]
+def categorizeUnsupervised(url): #automatically adds doc to closest category
+    doc, matched_category = categorize(url)
+    matched_category.update(doc)
+
+def categorizeSupervised(url): #asks user if the category is correct before adding
+    doc, matched_category = categorize(url)
     print('Belongs to: ' + matched_category.name)
     response = input('Add to category? ')
     if response.lower().startswith('y'):
@@ -29,7 +32,38 @@ def categorize():
         print('Added\n')
     else:
         print('Did not add\n')
+        
+def categorize(url):
+    doc = documentFromUrl(url, corpus)
+    distances = {}
+    for category in categories:
+        distances[category] = distance(doc, category.corpus, corpus)
 
+    matched_category = min(distances.items(), key=operator.itemgetter(1))[0]
+    return doc, matched_category
+
+def categorizeBookmarksUnsupervised():
+    urls_without_save = 0
+    for url in unsorted:
+        print('Processing ' + url)
+        categorizeUnsupervised(url)
+        urls_without_save += 1
+        if urls_without_save >= 10:
+            save()
+            urls_without_save = 0
+
+def categorizeBookmarksSupervised():
+    urls_without_save = 0
+    for url in unsorted:
+        print('Processing ' + url)
+        categorizeSupervised(url)
+        urls_without_save += 1
+        if urls_without_save >= 10:
+            response = input('Would you like to save? ')
+            if response.lower().startswith('y'):
+                save()
+                urls_without_save = 0
+                
 def createNewCategory():
     name = input('Enter category name: ')
     categories.append(Category(name))
@@ -61,7 +95,8 @@ def editCategory():
 def save():
     filename = input('Save as? ')
     save_dict = {'corpus': corpus,
-                 'categories': categories
+                 'categories': categories,
+                 'unsorted': unsorted
                  }
     with open(filename, 'wb') as f:
         pickle.dump(save_dict, f)
@@ -70,7 +105,7 @@ def load():
     filename = input('Filename? ')
     with open(filename, 'rb') as f:
         load_dict = pickle.load(f)
-    return load_dict['corpus'], load_dict['categories']
+    return load_dict['corpus'], load_dict['categories'], load_dict['unsorted']
 
 def endProgram():
     global running
@@ -82,7 +117,7 @@ def endProgram():
 if __name__ == '__main__':
     load_response = input('Load from file? ')
     if load_response.lower().startswith('y'):
-        corpus, categories = load()
+        corpus, categories, unsorted = load()
     else:
         #creates categories with predefined documents
         category_definitions = {'Python': ['https://www.python.org/',
@@ -102,13 +137,17 @@ if __name__ == '__main__':
                 print('reading ' + url)
                 category_docs.append(documentFromUrl(url, corpus))
             categories.append(Category(category_name, category_docs))
+        unsorted = bookmarksToUrls('Profile 1')
+        print('read in bookmarks')
 
 
-    options = [('Categorize a url', categorize),
+    options = [('Categorize a url', categorizeInput),
                ('Create new category', createNewCategory),
                ('Edit category', editCategory),
                ('Save', save),
-               ('Quit', endProgram)
+               ('Quit', endProgram),
+               ('Categorize bookmarks', categorizeBookmarksUnsupervised),
+               ('Categorize bookmarks (supervised)', categorizeBookmarksSupervised)
                ]
     running = True
     while(running):
