@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
-from corpus import *
+from bookmark_conversion import *
 from category import *
 from document import *
-from bookmark_conversion import *
+from test import testReadTimings
 import nltk, pickle, requests, operator
 
 
@@ -19,39 +19,6 @@ def categorizeInput():
 
     categorizeSupervised(url)
 
-def categorizeUnsupervised(url): #automatically adds doc to closest category
-    doc, matched_category = categorize(url)
-    matched_category.update(doc)
-
-def categorizeSupervised(url): #asks user if the category is correct before adding
-    doc, matched_category = categorize(url)
-    print('Belongs to: ' + matched_category.name)
-    response = input('Add to category? ')
-    if response.lower().startswith('y'):
-        matched_category.update(doc)
-        print('Added\n')
-    else:
-        print('Did not add\n')
-        
-def categorize(url):
-    doc = documentFromUrl(url, corpus)
-    distances = {}
-    for category in categories:
-        distances[category] = distance(doc, category.corpus, corpus)
-
-    matched_category = min(distances.items(), key=operator.itemgetter(1))[0]
-    return doc, matched_category
-
-def categorizeBookmarksUnsupervised():
-    urls_without_save = 0
-    for url in unsorted:
-        print('Processing ' + url)
-        categorizeUnsupervised(url)
-        urls_without_save += 1
-        if urls_without_save >= 10:
-            save()
-            urls_without_save = 0
-
 def categorizeBookmarksSupervised():
     urls_without_save = 0
     for url in unsorted:
@@ -63,6 +30,39 @@ def categorizeBookmarksSupervised():
             if response.lower().startswith('y'):
                 save()
                 urls_without_save = 0
+
+def categorizeBookmarksUnsupervised():
+    urls_without_save = 0
+    for url in unsorted:
+        print('Processing ' + url)
+        categorizeUnsupervised(url)
+        urls_without_save += 1
+        if urls_without_save >= 10:
+            saveToFile('save.txt')
+            urls_without_save = 0
+
+def categorizeSupervised(url): #asks user if the category is correct before adding
+    doc, matched_category = categorize(url)
+    print('Belongs to: ' + matched_category.name)
+    response = input('Add to category? ')
+    if response.lower().startswith('y'):
+        matched_category.update(doc)
+        print('Added\n')
+    else:
+        print('Did not add\n')
+
+def categorizeUnsupervised(url): #automatically adds doc to closest category
+    doc, matched_category = categorize(url)
+    matched_category.update(doc)
+
+def categorize(url):
+    doc = documentFromUrl(url)
+    distances = {}
+    for category in categories:
+        distances[category] = distance(doc, category.corpus, corpus)
+
+    matched_category = min(distances.items(), key=operator.itemgetter(1))[0]
+    return doc, matched_category
                 
 def createNewCategory():
     name = input('Enter category name: ')
@@ -81,7 +81,7 @@ def editCategory():
     response = input('Choose an option: ')
     if response == '0':
         url = input('Enter url: ')
-        doc = documentFromUrl(url, corpus)
+        doc = documentFromUrl(url)
         category.update(doc)
     elif response == '1':
         category.listDocuments()
@@ -94,13 +94,16 @@ def editCategory():
 
 def save():
     filename = input('Save as? ')
+    saveToFile(filename)
+
+def saveToFile(filename):
     save_dict = {'corpus': corpus,
                  'categories': categories,
                  'unsorted': unsorted
                  }
     with open(filename, 'wb') as f:
         pickle.dump(save_dict, f)
-
+        
 def load():
     filename = input('Filename? ')
     with open(filename, 'rb') as f:
@@ -111,31 +114,28 @@ def endProgram():
     global running
     running = False
 
-
-
-
 if __name__ == '__main__':
+    testReadTimings(3, 5)
     load_response = input('Load from file? ')
     if load_response.lower().startswith('y'):
         corpus, categories, unsorted = load()
     else:
         #creates categories with predefined documents
         category_definitions = {'Python': ['https://www.python.org/',
-                                            'http://en.wikipedia.org/wiki/Python_(programming_language)',
-                                            'http://learnpythonthehardway.org/book/'
+                                            #'http://en.wikipedia.org/wiki/Python_(programming_language)',
+                                            #'http://learnpythonthehardway.org/book/'
                                             ],
                                 'Gaming': ['http://kotaku.com/',
-                                            'http://www.gamespot.com/',
-                                            'http://www.ign.com/'
+                                            #'http://www.gamespot.com/',
+                                            #'http://www.ign.com/'
                                             ]
                                 }
-        corpus = Corpus()
         categories = []
         for category_name, urls in category_definitions.items():
             category_docs = []
             for url in urls:
                 print('reading ' + url)
-                category_docs.append(documentFromUrl(url, corpus))
+                category_docs.append(documentFromUrl(url))
             categories.append(Category(category_name, category_docs))
         unsorted = bookmarksToUrls('Profile 1')
         print('read in bookmarks')
@@ -144,10 +144,10 @@ if __name__ == '__main__':
     options = [('Categorize a url', categorizeInput),
                ('Create new category', createNewCategory),
                ('Edit category', editCategory),
+               ('Categorize bookmarks (supervised)', categorizeBookmarksSupervised),
+               ('Categorize bookmarks (unsupervised)', categorizeBookmarksUnsupervised),
                ('Save', save),
-               ('Quit', endProgram),
-               ('Categorize bookmarks', categorizeBookmarksUnsupervised),
-               ('Categorize bookmarks (supervised)', categorizeBookmarksSupervised)
+               ('Quit', endProgram)
                ]
     running = True
     while(running):

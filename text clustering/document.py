@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import nltk, requests
+from corpus import *
 
 class Document:
     def __init__(self, name, word_counts={}):
@@ -40,7 +41,9 @@ def distance(doc_a, doc_b, corpus):
         distance += abs(adjusted_a - adjusted_b)
     return distance
 
-def documentFromUrl(url, corpus):
+corpus = Corpus()
+def documentFromUrl(url):
+    global corpus
     #reads text from url and creates document while keeping corpus counts updated
     try:
         r = requests.get(url)
