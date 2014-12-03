@@ -86,11 +86,11 @@ class ApplicationList:
         self.apps = [app for app in self.apps if app.company_name != company_name]
 
     def search(self, key, value):
-        found = []
+        found = ApplicationList()
         k = attrgetter(key)
         for app in self.apps:
             if k(app) == value:
-                found.append(app)
+                found.add(app)
         return found
 
     def sort(self, sort_key, reverse=False):
@@ -182,7 +182,6 @@ class AppDetailView(GridLayout):
                 self.add_widget(Label(text=str(app_data[self.app_name][attribute])))
 
     def app_changed(self, list_adapter, *args):
-        print('change')
         if len(list_adapter.selection) == 0:
             self.app_name = None
         else:
@@ -225,9 +224,7 @@ class AppObserverDetailView(GridLayout):
             self.app_name =str(object_adapter.obj)
         self.redraw()
 
-
-
 if __name__ == '__main__':
-    from kivy.base import runTouchApp
-    master_detail = MasterDetailView(sorted(app_data.keys()), width=800)
-    runTouchApp(master_detail)
+	from kivy.base import runTouchApp
+	master_detail = MasterDetailView(sorted(app_data.keys()), width=800)
+	runTouchApp(master_detail)

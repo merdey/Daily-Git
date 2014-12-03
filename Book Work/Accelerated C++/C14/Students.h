@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "Handle.h"
 
 class Core {
@@ -18,32 +19,30 @@ class Core {
   virtual double grade() const;
   virtual std::istream& read(std::istream&);
 
-  friend class Student_info;
  protected:
-  virtual Core* clone() const { return new Core(*this); }
   std::istream& read_common(std::istream&);
   double midterm, final;
   std::vector<double> homework;
+  
+ public:
+	virtual Core* clone() const { return new Core(*this); }
+	
  private:
+  friend class Student_info;
   std::string n;
 };
 
-class Grad : public Core {
+class Grad: public Core {
  public:
   Grad(): thesis(0) {}
   Grad(std::istream& is) { read(is); }
 
   double grade() const;
   std::istream& read(std::istream&);
- protected:
-  Grad* clone() const { return new Grad(*this); }
  private:
   double thesis;
+  Grad* clone() const { return new Grad(*this); }
 };
-
-std::istream& read_hw(std::istream&, std::vector<double>&);
-bool compare(const Core&, const Core&);
-bool compare_Core_ptrs(const Core*, const Core*);
 
 class Student_info {
  public:
@@ -70,5 +69,9 @@ class Student_info {
  private:
   Handle<Core> cp;
 };
+
+std::istream& read_hw(std::istream&, std::vector<double>&);
+bool compare(const Core&, const Core&);
+bool compare_Core_ptrs(const Core*, const Core*);
 
 #endif

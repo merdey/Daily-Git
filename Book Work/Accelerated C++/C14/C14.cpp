@@ -4,10 +4,15 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "Handle.h"
 #include "Students.h"
 
 using namespace std;
+
+bool compare_Core_handles(const Handle<Core>& lhs, const Handle<Core>& rhs) {
+  return compare(*lhs, *rhs);
+}
 
 int main() {
   vector< Handle<Core> > students;
@@ -20,12 +25,13 @@ int main() {
       record = new Core;
     else
       record = new Grad;
+
     record->read(cin); //Handle<T>::-> then virtual call to read()
     maxlen = max(maxlen, record->name().size());
     students.push_back(record);
   }
   
-  sort(students.begin(), students.end(), Handle<Core>::compare_Core_handles);
+  sort(students.begin(), students.end(), compare_Core_handles);
 
   for (vector< Handle<Core> >::size_type i = 0; i != students.size(); ++i) {
     //students[i] is a Handle which we dereferencee to call the functions

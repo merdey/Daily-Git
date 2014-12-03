@@ -4,7 +4,7 @@ using std::istream;
 using std::vector;
 
 bool compare(const Student_info& x, const Student_info& y){
-	return x.name() > y.name();
+	return x.name > y.name;
 }
 
 istream& read(istream& is, Student_info& s) {
