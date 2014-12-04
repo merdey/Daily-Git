@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 import nltk, requests
+from nltk.corpus import stopwords
+from nltk.stem.porter import *
 from corpus import *
 
 class Document:
@@ -52,11 +54,15 @@ def documentFromUrl(url):
         raw = soup.get_text()
         
         #create a somewhat sanitized list of words
-        words = [token.lower() for token in nltk.word_tokenize(raw) if token.isalpha()]
+        filtered = [w for w in nltk.word_tokenize(raw) if w not in stopwords.words('english')]
+
+        #stem words
+        stemmer = PorterStemmer()
+        stemmed = [stemmer.stem(w) for w in filtered]
 
         #count words and create new document
         word_counts = {}
-        for word in words:
+        for word in stemmed:
             if word in word_counts:
                 word_counts[word] += 1
             else:
@@ -64,5 +70,5 @@ def documentFromUrl(url):
         doc = Document(url, word_counts)
         corpus.addDocument(doc)
         return doc
-    except:
-        print('Could not create document from url')
+    except requests.ConnectionError:
+        print('Could not connect to url')

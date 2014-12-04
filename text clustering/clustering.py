@@ -115,19 +115,19 @@ def endProgram():
     running = False
 
 if __name__ == '__main__':
-    testReadTimings(3, 5)
+    #testReadTimings(3, 5)
     load_response = input('Load from file? ')
     if load_response.lower().startswith('y'):
         corpus, categories, unsorted = load()
     else:
         #creates categories with predefined documents
         category_definitions = {'Python': ['https://www.python.org/',
-                                            #'http://en.wikipedia.org/wiki/Python_(programming_language)',
-                                            #'http://learnpythonthehardway.org/book/'
+                                            'http://en.wikipedia.org/wiki/Python_(programming_language)',
+                                            'http://learnpythonthehardway.org/book/'
                                             ],
                                 'Gaming': ['http://kotaku.com/',
-                                            #'http://www.gamespot.com/',
-                                            #'http://www.ign.com/'
+                                            'http://www.gamespot.com/',
+                                            'http://www.ign.com/'
                                             ]
                                 }
         categories = []
@@ -137,7 +137,7 @@ if __name__ == '__main__':
                 print('reading ' + url)
                 category_docs.append(documentFromUrl(url))
             categories.append(Category(category_name, category_docs))
-        unsorted = bookmarksToUrls('Profile 1')
+        unsorted = bookmarksToUrls('Profile 1')[100:200]
         print('read in bookmarks')
 
 
