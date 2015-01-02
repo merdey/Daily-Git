@@ -54,6 +54,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 	'/Users/MichaelE/Desktop/Daily Git/Django/django_test/templates',
+	'/Users/MichaelE/Desktop/Daily Git/Django/django_test/article/templates',
 )
 
 
@@ -88,5 +89,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
-
+STATIC_ROOT = ''
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    ('assets', '/Users/MichaelE/Desktop/Daily Git/Django/django_test/static'),
+)
