@@ -1,6 +1,8 @@
 from django.shortcuts import render_to_response
 from article.models import Article
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from forms import ArticleForm
+from django.core.context_processors import csrf
 
 def articles(request):
 	return render_to_response('articles.html', 
@@ -23,9 +25,22 @@ def article(request, article_id=1):
 
 def language(request, language='en-us'):
 	response = HttpResponse("setting language to %s" % language)
-	
 	response.set_cookie('lang', language)
-	
 	request.session['lang'] = language
-	
 	return response
+	
+def create(request):
+	if request.POST:
+		form = ArticleForm(request.POST)
+		if form.is_valid():
+			form.save()
+			
+			return HttpResponseRedirect('/articles/all')
+	else:
+		form = ArticleForm()
+	
+	args = {}
+	args.update(csrf(request))
+	args['form'] = form
+	
+	return render_to_response('create_article.html', args)
