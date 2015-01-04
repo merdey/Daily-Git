@@ -5,8 +5,12 @@ from forms import ArticleForm
 from django.core.context_processors import csrf
 
 def articles(request):
-	return render_to_response('articles.html', 
-	                         {'articles': Article.objects.all()})
+	args = {}
+	args.update(csrf(request))
+	
+	args['articles'] = Article.objects.all()
+
+	return render_to_response('articles.html', args)
 	
 def article(request, article_id=1):
 	language = 'en-us'
@@ -52,3 +56,13 @@ def create(request):
 	args['form'] = form
 	
 	return render_to_response('create_article.html', args)
+	
+def search_titles(request):
+	if request.method == "POST":
+		search_text = request.POST['search_text']
+	else:
+		search_text = ''
+		
+	articles = Article.objects.filter(title__contains=search_text)
+	
+	return render_to_response('ajax_search.html', {'articles': articles})

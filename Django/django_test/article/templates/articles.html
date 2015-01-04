@@ -2,6 +2,25 @@
 
 {% block title %}All Articles{% endblock %}
 
+{% block sidebar %}
+
+<ul>
+	<li><a href="/articles/all">Articles</a></li>
+	<li><a href="/admin/">Admin</a></li>
+	<li><a href="/accounts/login">Log In</a></li>
+	<li><a href="/accounts/register">Register</a></li>
+	<li><a href="/articles/create">Create Article</a></li>
+</ul>
+<h3>Search</h3>
+{% csrf_token %}
+<input type="text" id="search" name="search" />
+
+<ul id="search-results">
+
+</ul>
+
+{% endblock %}
+
 {% block content %}
 
 {% if articles.count > 0 %}
