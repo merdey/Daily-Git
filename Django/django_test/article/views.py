@@ -22,6 +22,14 @@ def article(request, article_id=1):
 	                         {'article': Article.objects.get(id=article_id),
 							  'language': language,
 							  'session_language': session_language})
+							 
+def like_article(request, article_id=1):
+	if article_id:
+		article = Article.objects.get(id=article_id)
+		article.likes += 1
+		article.save()
+	
+	return HttpResponseRedirect('/articles/get/%s' % article_id)
 
 def language(request, language='en-us'):
 	response = HttpResponse("setting language to %s" % language)
