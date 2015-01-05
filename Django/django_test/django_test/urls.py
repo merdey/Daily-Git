@@ -6,6 +6,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^articles/', include('article.urls')),
+	url(r'^accounts/', include('userprofile.urls')),
 	url(r'^accounts/login/$', 'django_test.views.login'),
 	url(r'^accounts/auth/$', 'django_test.views.auth_view'),
 	url(r'^accounts/logout/$', 'django_test.views.logout'),

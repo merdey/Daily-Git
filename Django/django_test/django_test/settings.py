@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'article',
+	'userprofile',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,6 +56,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 	'/Users/MichaelE/Desktop/Daily Git/Django/django_test/templates',
 	'/Users/MichaelE/Desktop/Daily Git/Django/django_test/article/templates',
+	'/Users/MichaelE/Desktop/Daily Git/Django/django_test/userprofile/templates',
 )
 
 
@@ -94,3 +96,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     ('assets', '/Users/MichaelE/Desktop/Daily Git/Django/django_test/static'),
 )
+
+AUTH_PROFILE_MODULE = 'userprofile.UserProfile'
