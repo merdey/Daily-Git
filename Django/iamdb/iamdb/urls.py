@@ -5,5 +5,5 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^books/', include('books.urls')),
-	url(r'^home/', 'iamdb.views.home'),
+	url(r'^', 'iamdb.views.home'),
 )
