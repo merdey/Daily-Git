@@ -1,0 +1,39 @@
+use std::io;
+use std::cmp::Ordering;
+
+fn cmp(a: u8, b: u8) -> Ordering {
+   if a < b { Ordering::Less }
+   else if a > b { Ordering::Greater }
+   else { Ordering::Equal }
+}
+
+fn main() {
+    let difficulty = 100;
+    println!("Guessing Game");
+    println!("I'm thinking of a number between 1 and {}", difficulty);
+
+    let answer: u8 = 74;
+    let mut guess: u8 = 0;
+    
+    while guess != answer {
+    	println!("Guess the number: ");
+
+	let mut input = String::new();	
+        io::stdin().read_line(&mut input).ok().expect("Error getting input");
+        
+	let guess = match input.trim().parse() {
+	    Ok(num) => num,
+	    Err(_) => {
+	    	   println!("Guess was not a number, guess again");
+		   continue;
+	   	   },
+	};
+
+	println!("{}", match cmp(guess, answer) {
+	      Ordering::Less => "Too low",
+	      Ordering::Greater => "Too high",
+	      Ordering::Equal => "You win!",
+	});
+    }
+
+}
